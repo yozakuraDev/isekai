@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String      @id @default(uuid())
+  username      String
+  email         String      @unique
+  password      String?
+  discordId     String?     @unique
+  avatar        String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  characters    Character[]
+  posts         Post[]
+  likedPosts    Post[]      @relation("UserLikes")
+}
+
+model Character {
+  id            String      @id @default(uuid())
+  username      String
+  race          String
+  class         String
+  level         Int         @default(1)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Post {
+  id            String      @id @default(uuid())
+  content       String
+  timestamp     DateTime    @default(now())
+  likes         Int         @default(0)
+  authorId      String
+  author        User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  likedBy       User[]      @relation("UserLikes")
+}
+
+model Boss {
+  id            Int         @id @default(autoincrement())
+  name          String
+  location      String
+  defeated      Boolean     @default(false)
+}
+
+model ServerStatus {
+  id            Int         @id @default(1)
+  online        Boolean     @default(true)
+  players       Int         @default(0)
+  maxPlayers    Int         @default(100)
+  event         String      @default("blood_moon_festival")
+  uptimeDays    Int         @default(0)
+  uptimeHours   Int         @default(0)
+  uptimeMinutes Int         @default(0)
+  lastUpdated   DateTime    @default(now())
+}
+
+model Ranking {
+  id            String      @id @default(uuid())
+  type          String      // "hyakki" or "pvp"
+  rank          Int
+  player        String
+  score         Int         // defeats or kills
+}

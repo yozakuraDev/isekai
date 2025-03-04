@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+      - PORT=8080
+      - JWT_SECRET=hyakki_isekai_secret_key_production
+      - VITE_API_URL=https://api.yukkurinet.com/api
+      - DISCORD_CLIENT_ID=1318895201309294624
+      - DISCORD_CLIENT_SECRET=SLZOWu6ZGFN-du3J4C_Uk6ivnVZylkop
+      - DISCORD_CALLBACK_URL=https://api.yukkurinet.com/api/auth/discord/callback
+      - SESSION_SECRET=hyakki_isekai_session_secret_production
+      - DATABASE_URL=file:/app/prisma/prod.db
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./uploads:/app/uploads
+      - ./prisma:/app/prisma
+    depends_on:
+      - redis
+    restart: always
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: always
+
+volumes:
+  redis-data:
